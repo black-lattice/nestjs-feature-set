@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .img {
+      width: 200px;
+      height: 200px;
+    }
+
+    .qrcode-login {
+      width: calc(100% - 40px);
+    }
+
+    .btn {
+      border-radius: 4px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .confirm {
+      background-color: #0068ff;
+      color: #ffffff
+    }
+
+    .cancel {
+      color: #a0a2a4;
+      background-color: #eaeaea;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="img">
+    <img src="" alt="">
+  </div>
+  <div class="qrcode-login">
+    <div class="btn confirm" id="confirm">确认</div>
+    <div class="btn cancel" id="cancel">取消</div>
+  </div>
+</body>
+<script>
+  const uuid = new URLSearchParams(window.location.search.slice(1)).get('id')
+  axios.get(`/qrcode/scan?id=${uuid}`)
+  document.getElementById('confirm').onclick = async function () {
+    const { data } = await axios.post(`/qrcode/confirm`, { id: uuid, mobile: '18688888888', password: '123456' })
+
+  }
+  document.getElementById('cancel').onclick = async function () {
+    const { data } = await axios.get(`/qrcode/cancel?id=${uuid}`)
+  }
+</script>
+
+</html>

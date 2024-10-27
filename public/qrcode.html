@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+
+    #qrcode {
+      width: 200px;
+      height: 200px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="qrcode-img">
+    <img id="qrcode" src="">
+    <div id="qrcode-status"></div>
+  </div>
+</body>
+<script>
+  const qrcode_img = document.getElementById('qrcode')
+  let qrcode_id = ''
+  async function getImg() {
+    const { data } = await axios.get('/qrcode/generate')
+    console.log(qrcode_img);
+    qrcode_img.src = data.img;
+    qrcode_id = data.qrcode_id
+    check(qrcode_id)
+  }
+  let intervalId = null
+  async function check(id) {
+    const qrcode_status = document.getElementById('qrcode-status');
+    const { data } = await axios.get(`/qrcode/check?id=${id}&v=${new Date().getTime()}`)
+    let status = data.status;
+    let status_text = ''
+    switch (status) {
+      case 'noscan':
+        status_text = '未扫描'
+        break;
+      case 'scan-wait-confirm':
+        status_text = '已扫描，等待用户确认';
+        break;
+      case 'scan-confirm':
+        status_text = '已扫描，用户同意授权';
+        break;
+      case 'scan-cancel':
+        status_text = '已扫描，用户取消授权';
+        break;
+      case 'expired':
+        status_text = '已过期';
+        break;
+    }
+    qrcode_status.innerText = status_text;
+    if (status === 'noscan' || status === 'scan-wait-confirm') {
+      setTimeout(() => {
+        check(id)
+      }, 2000);
+    }
+  }
+  getImg();
+</script>
+
+</html>
