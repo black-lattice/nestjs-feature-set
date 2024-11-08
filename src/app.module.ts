@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { UserModule } from './user/user.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
+import { AlgorithmModule } from './algorithm/algorithm.module';
 @Module({
   imports: [
     // 连接数据库
@@ -23,6 +24,7 @@ import { QrcodeModule } from './qrcode/qrcode.module';
     }),
     UserModule,
     QrcodeModule,
+    AlgorithmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

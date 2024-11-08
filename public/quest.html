@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .ul {
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+      overflow-y: auto;
+    }
+
+    .ul li {
+      list-style: none;
+      cursor: pointer;
+      /* color: blue; */
+    }
+
+    .iframe {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .isActive {
+      color: blue;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <ul class="ul" @click="nameClick">
+      <li :class="[currentHtml === name ? 'isActive' : '']" v-for="name in fileNames" :key="name">{{name}}</li>
+    </ul>
+    <iframe class="iframe" :src="currentHtml" frameborder="0"></iframe>
+  </div>
+</body>
+
+<script type="module">
+  import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+
+  createApp({
+    setup() {
+      const fileNames = ref([])
+      async function getImg() {
+        const { data } = await axios.get('/algorithm/list')
+        fileNames.value = data.data.reverse();
+      }
+      getImg();
+      let currentHtml = ref('')
+      function nameClick(e) {
+        const name = e.target.innerText
+        currentHtml.value = name
+      }
+      return {
+        fileNames,
+        nameClick,
+        currentHtml
+      }
+    }
+  }).mount('#app')
+</script>
+
+</html>

@@ -2,11 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets('public', {
     prefix: '/qrcode-login',
+  });
+  app.useStaticAssets('public/question_bank', {
+    prefix: '/question',
+  });
+  app.useStaticAssets('public', {
+    prefix: '/question',
   });
 
   // swagger API文档
