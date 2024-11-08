@@ -23,8 +23,13 @@
       grid-template-columns: 1fr 2fr;
     }
 
-    .ul {
+    .left {
       height: 100%;
+      overflow: hidden;
+    }
+
+    .ul {
+      height: calc(100% - 40px);
       margin: 0px;
       padding: 0px;
       overflow-y: auto;
@@ -50,9 +55,16 @@
 
 <body>
   <div id="app">
-    <ul class="ul" @click="nameClick">
-      <li :class="[currentHtml === name ? 'isActive' : '']" v-for="name in fileNames" :key="name">{{name}}</li>
-    </ul>
+    <div class="left">
+      <div class="search">
+        <input type="text" v-model="sname">
+        <button @click="searchName">搜索</button>
+      </div>
+      <ul class="ul" @click="nameClick">
+        <li :class="[currentHtml === name ? 'isActive' : '']" v-for="name in fileNames" :key="name">{{name}}</li>
+      </ul>
+    </div>
+
     <iframe class="iframe" :src="currentHtml" frameborder="0"></iframe>
   </div>
 </body>
@@ -63,9 +75,11 @@
   createApp({
     setup() {
       const fileNames = ref([])
+      const cacheNames = ref([]);
       async function getImg() {
         const { data } = await axios.get('/algorithm/list')
         fileNames.value = data.data.reverse();
+        cacheNames.value = fileNames.value;
       }
       getImg();
       let currentHtml = ref('')
@@ -73,10 +87,36 @@
         const name = e.target.innerText
         currentHtml.value = name
       }
+      let sname = ref('');
+      function findName() {
+        console.log(sname.value);
+        if (sname.value) {
+          let res = cacheNames.value.filter(item => item.includes(sname.value));
+          fileNames.value = res;
+        } else {
+          fileNames.value = cacheNames.value
+        }
+      }
+      function debounce(fn, delay) {
+        let timer = null;
+        return function () {
+          if (timer) {
+            clearTimeout(timer)
+            timer = null;
+          }
+          timer = setTimeout(() => {
+            fn();
+            timer = null
+          }, delay);
+        }
+      }
+      const searchName = debounce(findName, 300);
       return {
         fileNames,
         nameClick,
-        currentHtml
+        currentHtml,
+        searchName,
+        sname
       }
     }
   }).mount('#app')
